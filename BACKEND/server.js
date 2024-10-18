@@ -1,11 +1,27 @@
 const express = require('express')
+const bodyparser = require('body-parser');
 const cors = require('cors')
+const mongoose = require('mongoose');
+require('dotenv').config();
+const authRoutes = require('./routes/authroutes');
+
+const app = express();
 const PORT = 3000 || process.env.PORT
 
-const app = express()
-app.use(cors())
+//middleware
+app.use(bodyparser.json());
+app.use(cors());
 
-app.use(express.json())
+//connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+   useNewUrlParser: true,
+   useUnifiedTopology: true,
+}).then(() => console.log('connected to MongoDB'))
+.catch((err) => console.error('Error connecting to MongoDB:', err));
+
+//Routes
+app.use('/api/auth', authRoutes);
+
 app.listen(PORT, () => {
-   console.info("Server is cooking on port", PORT);
-})
+   console.log('Server running on http://locahost:${PORT}');
+});
